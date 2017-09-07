@@ -1,6 +1,6 @@
 {
-  "name": "fh-cls-mongoose",
-  "version": "2.1.0",
+  "name": "cls-mongoose-shim",
+  "version": "0.0.1",
   "description": "Continuation-local-storage (CLS) mongoose shim",
   "main": "index.js",
   "scripts": {
@@ -8,26 +8,28 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/feedhenry/cls-mongoose.git"
+    "url": "git+https://github.com/wayglem/cls-mongoose.git"
   },
   "keywords": [
     "mongoose",
-    "cls"
+    "cls",
+    "Continuation local storage"
   ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/feedhenry/cls-mongoose/issues"
+    "url": "https://github.com/wayglem/cls-mongoose/issues"
   },
-  "homepage": "https://github.com/feedhenry/cls-mongoose#readme",
+  "homepage": "https://github.com/wayglem/cls-mongoose#readme",
   "dependencies": {
     "shimmer": "^1"
   },
   "peerDependencies": {
-    "mongoose": ">= 3.8.16 <= 4.5.0"
+    "mongoose": ">=4.5.0 <=4.11"
   },
   "devDependencies": {
+    "mocha": "*",
     "tap": "~1.3.2",
-    "mongoose": "3.8.*",
+    "mongoose": ">=4.5.0 <=4.11",
     "continuation-local-storage": "*",
     "should": "*"
   }
