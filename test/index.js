@@ -25,10 +25,8 @@ describe("mongoose with cls", function() {
 
   before(function(done) {
 
-    //var context = clsNamespace.createContext();
-    //clsNamespace.enter(context);
     console.log("mongoose version: " + mongooseVersion);
-    mongoose.connect('mongodb://localhost/mongoose-cls-test', done);
+    mongoose.connect('mongodb://localhost/mongoose-cls-test', {useMongoClient: true}, done);
   });
 
 
@@ -36,8 +34,6 @@ describe("mongoose with cls", function() {
     mongoose.disconnect();
   });
 
-
-  /*
 
   it("Model#find callback", function*() {
     yield function(callback) {
@@ -85,7 +81,7 @@ describe("mongoose with cls", function() {
   it("Model#count promise", function(done) {
     TestModel.count({}).then(done.bind(null, null), done);
   });
-*/
+
 
   it("Model#find callback", function(done) {
     clsNamespace.run(function() {
@@ -113,6 +109,24 @@ describe("mongoose with cls", function() {
     });
   });
 
+
+  it("Model#findOneAndupdate callback", function(done) {
+    clsNamespace.run(function() {
+      var value = Math.random();
+      clsNamespace.set("value", value);
+      const testModel = new TestModel({'value': "nonexistent_value"});
+      testModel.save(function (error, testModel) {
+        should.not.exist(error);
+        TestModel.findOneAndUpdate({'value': "nonexistent_value"}, {'value': "existent_value"}, {upsert: true,'new': true}, function (error, updatedValue) {
+          should.not.exist(error);
+          clsNamespace.set("otherValue", 0);
+          clsNamespace.get("value").should.be.eql(value);
+          done();
+        });
+      });
+    });
+  });
+
   it("Model#aggregate callback", function(done) {
     clsNamespace.run(function() {
       var value = Math.random();
@@ -126,7 +140,7 @@ describe("mongoose with cls", function() {
     });
   });
 
-/*
+
   it("Model#aggregate promise", function(done) {
     clsNamespace.run(function() {
       var value = Math.random();
@@ -139,7 +153,6 @@ describe("mongoose with cls", function() {
       }, done);
     });
   });
-*/
 
 });
 

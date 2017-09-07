@@ -24,10 +24,12 @@ var getMongooseVersion = function() {
 tap.test("mongoose with cls", function (t) {
     
     var mongooseVersion = getMongooseVersion();
-    
+    console.log("testing mongoose version " + mongooseVersion);
     //connect mongoose to some mongo instance
-    mongoose.connect('mongodb://localhost/mongoose-cls-test', function(err) {
-        
+    mongoose.Promise = Promise;
+    var promise = mongoose.connect('mongodb://localhost/mongoose-cls-test', {useMongoClient: true});
+    promise.then(function (db) {
+
         //define a mongoose Model
         var TestModel = mongoose.model('test_model', mongoose.Schema({value: String}));
         
@@ -67,7 +69,20 @@ tap.test("mongoose with cls", function (t) {
                 });
             });
         });
-        
+
+        t.test("findOneAndUpdate - mongoose " + mongooseVersion, function(tt) {
+            clsns.run(function() {
+                clsns.set("nsvalue", "set");
+                const testModel = new TestModel({'value': "nonexistent_value"});
+                testModel.save(function (error, testModel) {
+                    TestModel.findOneAndUpdate({'value': "nonexistent_value"}, {'value': "existent_value"}, {upsert: true,'new': true}, function (error, updatedValue) {
+                        tt.equals(clsns.get("nsvalue"), "set");
+                        tt.end();
+                    });
+                });
+            });
+        });
+
         t.test("distinct - mongoose " + mongooseVersion, function(tt) {
             clsns.run(function() {
                 clsns.set("nsvalue", "set");
@@ -87,7 +102,7 @@ tap.test("mongoose with cls", function (t) {
                 });
             });
         });
-        
+
         t.test("aggregate - mongoose " + mongooseVersion, function(tt) {
             clsns.run(function() {
                 clsns.set("nsvalue", "set");
@@ -99,7 +114,6 @@ tap.test("mongoose with cls", function (t) {
                 );
             });
         });
-        
         t.end();
     });  //mongoose.connect()
 

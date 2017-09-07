@@ -33,4 +33,19 @@ module.exports = function patchMPromise(ns, _mongoose) {
       return original.call(this, method, callback, queryInfo);
     };
   });
+
+  shimmer.wrap(mongoose.Mongoose.prototype.Model, '$wrapCallback', function (original) {
+    return function(callback){
+      if (typeof callback == 'function') callback = ns.bind(callback);
+      return original.call(this, callback);
+    }
+  });
+
+  shimmer.wrap(mongoose.Mongoose.prototype.Aggregate.prototype, 'exec', function (original) {
+    return function(callback){
+      if (typeof callback == 'function') callback = ns.bind(callback);
+      return original.call(this, callback);
+    }
+  });
+
 };
