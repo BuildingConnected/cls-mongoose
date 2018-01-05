@@ -27,7 +27,12 @@ tap.test("mongoose with cls", function (t) {
     console.log("testing mongoose version " + mongooseVersion);
     //connect mongoose to some mongo instance
     mongoose.Promise = Promise;
-    var promise = mongoose.connect('mongodb://localhost/mongoose-cls-test', {useMongoClient: true});
+    var connectOptions = {};
+    var majorMongooseVersion = mongooseVersion.split(".")[0];
+    if (parseInt(majorMongooseVersion) < 5) {
+        connectOptions = {useMongoClient: true}
+    }
+    var promise = mongoose.connect('mongodb://localhost/mongoose-cls-test', connectOptions);
     promise.then(function (db) {
 
         //define a mongoose Model
@@ -63,7 +68,7 @@ tap.test("mongoose with cls", function (t) {
         t.test("update - mongoose " + mongooseVersion, function(tt) {
             clsns.run(function() {
                 clsns.set("nsvalue", "set");
-                TestModel.update( {"nonexistent_field": "nonexistent_value"}, {$set: {value: "modified entry"}}, function(err, updateResult) {
+                TestModel.update( {"nonexistent_field": "nonexistent_value"}, {$set: {value: "modified entry"}}, {}, function(err, updateResult) {
                     tt.equals(clsns.get("nsvalue"), "set");
                     tt.end();
                 });
