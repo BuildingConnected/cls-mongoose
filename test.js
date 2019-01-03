@@ -27,7 +27,7 @@ tap.test("mongoose with cls", function (t) {
     console.log("testing mongoose version " + mongooseVersion);
     //connect mongoose to some mongo instance
     mongoose.Promise = Promise;
-    var connectOptions = {};
+    var connectOptions = {useNewUrlParser: true};
     var majorMongooseVersion = mongooseVersion.split(".")[0];
     if (parseInt(majorMongooseVersion) < 5) {
         connectOptions = {useMongoClient: true}
@@ -74,6 +74,24 @@ tap.test("mongoose with cls", function (t) {
                 });
             });
         });
+        t.test("updateMany - mongoose " + mongooseVersion, function(tt) {
+            clsns.run(function() {
+                clsns.set("nsvalue", "set");
+                TestModel.updateMany( {"nonexistent_field": "nonexistent_value"}, {$set: {value: "modified entry"}}, {}, function(err, updateResult) {
+                    tt.equals(clsns.get("nsvalue"), "set");
+                    tt.end();
+                });
+            });
+        });
+        t.test("updateOne - mongoose " + mongooseVersion, function(tt) {
+            clsns.run(function() {
+                clsns.set("nsvalue", "set");
+                TestModel.updateOne( {"nonexistent_field": "nonexistent_value"}, {$set: {value: "modified entry"}}, {}, function(err, updateResult) {
+                    tt.equals(clsns.get("nsvalue"), "set");
+                    tt.end();
+                });
+            });
+        });
 
         t.test("findOneAndUpdate - mongoose " + mongooseVersion, function(tt) {
             clsns.run(function() {
@@ -107,11 +125,29 @@ tap.test("mongoose with cls", function (t) {
                 });
             });
         });
+        t.test("count - mongoose " + mongooseVersion, function(tt) {
+            clsns.run(function() {
+                clsns.set("nsvalue", "set");
+                TestModel.countDocuments({}, function (err, findResult) {
+                    tt.equals(clsns.get("nsvalue"), "set");
+                    tt.end();
+                });
+            });
+        });
+        t.test("count - mongoose " + mongooseVersion, function(tt) {
+            clsns.run(function() {
+                clsns.set("nsvalue", "set");
+                TestModel.estimatedDocumentCount({}, function (err, findResult) {
+                    tt.equals(clsns.get("nsvalue"), "set");
+                    tt.end();
+                });
+            });
+        });
 
         t.test("aggregate - mongoose " + mongooseVersion, function(tt) {
             clsns.run(function() {
                 clsns.set("nsvalue", "set");
-                TestModel.aggregate({$match: {"nonexistent_field": "nonexistent_value"}})
+                TestModel.aggregate([{$match: {"nonexistent_field": "nonexistent_value"}}])
                     .exec(function(err, aggregateResult) {
                         tt.equals(clsns.get("nsvalue"), "set");
                         tt.end();
