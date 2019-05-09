@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-var shimmer = require('shimmer');
-
+var shimmer = require("shimmer");
 
 module.exports = function patchMPromise(ns, _mongoose) {
-
   //If there are multiple mongoose versions in the dependency tree, then the `require('mongodb')` could contain differnent objects
-  // This allows users to explicitly pass a `mongoose` object to bind. 
-  var mongoose = _mongoose || require('mongoose');
-  if (typeof ns.bind !== 'function') {
+  // This allows users to explicitly pass a `mongoose` object to bind.
+  var mongoose = _mongoose || require("mongoose");
+  if (typeof ns.bind !== "function") {
     throw new TypeError("must include namespace to patch Mongoose against");
   }
 
   if (mongoose.Mongoose.prototype.Promise.prototype.on) {
-    shimmer.wrap(mongoose.Mongoose.prototype.Promise.prototype, 'on', function (original) {
+    shimmer.wrap(mongoose.Mongoose.prototype.Promise.prototype, "on", function(
+      original
+    ) {
       return function(event, callback) {
         callback = ns.bind(callback);
         return original.call(this, event, callback);
@@ -21,33 +21,67 @@ module.exports = function patchMPromise(ns, _mongoose) {
     });
   }
 
-  shimmer.wrap(mongoose.Mongoose.prototype.Query.prototype, 'exec', function (original) {
+  shimmer.wrap(mongoose.Mongoose.prototype.Query.prototype, "exec", function(
+    original
+  ) {
     return function(op, callback) {
-      if (typeof op == 'function') op = ns.bind(op);
-      if (typeof callback == 'function') callback = ns.bind(callback);
+      if (typeof op == "function") op = ns.bind(op);
+      if (typeof callback == "function") callback = ns.bind(callback);
       return original.call(this, op, callback);
     };
   });
 
-  shimmer.wrap(mongoose.Mongoose.prototype.Query.base, '_wrapCallback', function (original) {
-    return function(method, callback, queryInfo) {
-      if (typeof callback == 'function') callback = ns.bind(callback);
-      return original.call(this, method, callback, queryInfo);
+  shimmer.wrap(
+    mongoose.Mongoose.prototype.Query.base,
+    "_wrapCallback",
+    function(original) {
+      return function(method, callback, queryInfo) {
+        if (typeof callback == "function") callback = ns.bind(callback);
+        return original.call(this, method, callback, queryInfo);
+      };
+    }
+  );
+
+  shimmer.wrap(mongoose.Mongoose.prototype.Model, "$wrapCallback", function(
+    original
+  ) {
+    return function(callback) {
+      if (typeof callback == "function") callback = ns.bind(callback);
+      return original.call(this, callback);
     };
   });
 
-  shimmer.wrap(mongoose.Mongoose.prototype.Model, '$wrapCallback', function (original) {
-    return function(callback){
-      if (typeof callback == 'function') callback = ns.bind(callback);
-      return original.call(this, callback);
+  shimmer.wrap(
+    mongoose.Mongoose.prototype.Aggregate.prototype,
+    "exec",
+    function(original) {
+      return function(callback) {
+        if (typeof callback == "function") callback = ns.bind(callback);
+        return original.call(this, callback);
+      };
     }
-  });
+  );
 
-  shimmer.wrap(mongoose.Mongoose.prototype.Aggregate.prototype, 'exec', function (original) {
-    return function(callback){
-      if (typeof callback == 'function') callback = ns.bind(callback);
-      return original.call(this, callback);
+  for (const func in mongoose.Mongoose.prototype.Collection.prototype) {
+    if (
+      mongoose.Mongoose.prototype.Collection.prototype.hasOwnProperty(func) &&
+      typeof mongoose.Mongoose.prototype.Collection.prototype[func] ===
+        "function" &&
+      func[0] !== "$"
+    ) {
+      shimmer.wrap(
+        mongoose.Mongoose.prototype.Collection.prototype,
+        func,
+        function(original) {
+          return function() {
+            const args = Array.from(arguments);
+            let callback = args[args.length - 1];
+            if (typeof callback == "function") callback = ns.bind(callback);
+            const newArgs = [...args.slice(0, -1), callback];
+            return original.apply(this, newArgs);
+          };
+        }
+      );
     }
-  });
-
+  }
 };
