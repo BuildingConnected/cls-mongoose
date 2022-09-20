@@ -1,6 +1,6 @@
 {
   "name": "cls-mongoose-shim",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Continuation-local-storage (CLS) mongoose shim",
   "main": "index.js",
   "scripts": {
@@ -24,12 +24,12 @@
     "shimmer": "^1"
   },
   "peerDependencies": {
-    "mongoose": ">=4.5.0 <= 5.x"
+    "mongoose": ">=4.5.0 <6"
   },
   "devDependencies": {
     "mocha": "*",
     "tap": "13.1.2",
-    "mongoose": ">=4.5.0 <= 5.x",
+    "mongoose": ">=4.5.0 <6",
     "cls-hooked": "*",
     "should": "*"
   }
