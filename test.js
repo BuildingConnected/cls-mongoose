@@ -198,7 +198,7 @@ tap.test("mongoose with cls", function(t) {
           testModel.save(function(error, testModel) {
             TestModel.collection.findOneAndUpdate(
               { value: "nonexistent_value" },
-              { value: "existent_value" },
+              { $set: { value: "existent value" } },
               { upsert: true, new: true },
               function(error, updatedValue) {
                 tt.equals(clsns.get("nsvalue"), "set");
