@@ -1,6 +1,6 @@
 {
-  "name": "cls-mongoose-shim",
-  "version": "0.0.8",
+  "name": "@adsk/cls-mongoose-shim",
+  "version": "0.0.9",
   "description": "Continuation-local-storage (CLS) mongoose shim",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wayglem/cls-mongoose.git"
+    "url": "git+https://github.com/BuildingConnected/cls-mongoose.git"
   },
   "keywords": [
     "mongoose",
@@ -17,9 +17,9 @@
   ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/wayglem/cls-mongoose/issues"
+    "url": "https://github.com/BuildingConnected/cls-mongoose/issues"
   },
-  "homepage": "https://github.com/wayglem/cls-mongoose#readme",
+  "homepage": "https://github.com/BuildingConnected/cls-mongoose#readme",
   "dependencies": {
     "shimmer": "^1"
   },
