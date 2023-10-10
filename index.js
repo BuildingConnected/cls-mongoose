@@ -3,7 +3,8 @@
 var shimmer = require("shimmer");
 
 module.exports = function patchMPromise(ns, _mongoose) {
-  //If there are multiple mongoose versions in the dependency tree, then the `require('mongodb')` could contain differnent objects
+
+  // If there are multiple mongoose versions in the dependency tree, then the `require('mongodb')` could contain different objects
   // This allows users to explicitly pass a `mongoose` object to bind.
   var mongoose = _mongoose || require("mongoose");
   if (typeof ns.bind !== "function") {
@@ -61,27 +62,4 @@ module.exports = function patchMPromise(ns, _mongoose) {
       };
     }
   );
-
-  for (const func in mongoose.Mongoose.prototype.Collection.prototype) {
-    if (
-      mongoose.Mongoose.prototype.Collection.prototype.hasOwnProperty(func) &&
-      typeof mongoose.Mongoose.prototype.Collection.prototype[func] ===
-        "function" &&
-      func[0] !== "$"
-    ) {
-      shimmer.wrap(
-        mongoose.Mongoose.prototype.Collection.prototype,
-        func,
-        function(original) {
-          return function() {
-            const args = Array.from(arguments);
-            let callback = args[args.length - 1];
-            if (typeof callback == "function") callback = ns.bind(callback);
-            const newArgs = [...args.slice(0, -1), callback];
-            return original.apply(this, newArgs);
-          };
-        }
-      );
-    }
-  }
 };

@@ -24,15 +24,7 @@ tap.test("mongoose with cls", function(t) {
   console.log("testing mongoose version " + mongooseVersion);
   //connect mongoose to some mongo instance
   mongoose.Promise = Promise;
-  var connectOptions = { useNewUrlParser: true };
-  var majorMongooseVersion = mongooseVersion.split(".")[0];
-  if (parseInt(majorMongooseVersion) < 5) {
-    connectOptions = { useMongoClient: true };
-  }
-  var promise = mongoose.connect(
-    "mongodb://localhost/mongoose-cls-test",
-    connectOptions
-  );
+  var promise = mongoose.connect("mongodb://localhost/mongoose-cls-test");
   promise.then(function(db) {
     //define a mongoose Model
     var TestModel = mongoose.model(

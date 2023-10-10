@@ -26,7 +26,7 @@ describe("mongoose with cls", function() {
   before(function(done) {
 
     console.log("mongoose version: " + mongooseVersion);
-    mongoose.connect('mongodb://localhost/mongoose-cls-test', {useMongoClient: true}, done);
+    mongoose.connect('mongodb://localhost/mongoose-cls-test', done);
   });
 
 
